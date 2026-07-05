@@ -104,5 +104,4 @@ Distilled from a production desktop time-series annotation app. The interaction
 patterns (coalesced navigation, direct restyle, auto-pan drag-select) are the
 transferable innovations this template exists to share.
 
-No license file is included — add one before publishing (MIT is a good default
-for a shareable template).
+Released under the MIT License — see [`LICENSE`](LICENSE).
