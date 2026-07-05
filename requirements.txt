@@ -1,0 +1,10 @@
+# Pinned to a known-good combination (Dash 3 + Plotly 6 + plotly-resampler 0.11).
+# Loosen as needed, but keep dash / plotly / plotly-resampler mutually compatible.
+dash>=3.0,<4
+dash-bootstrap-components>=2.0
+dash-extensions>=2.0
+plotly>=6.0
+plotly-resampler>=0.11
+numpy>=1.24
+pandas>=2.0
+pywebview>=5.0
