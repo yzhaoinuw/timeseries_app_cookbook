@@ -43,6 +43,23 @@ Newest entry goes on top. If the session did multiple distinct pieces of work, u
 
 ## 2026-07-05
 
+### Doc reconciliation: merge cookbook into README (claude-fable-5)
+
+- Collapsed overlapping docs. The per-feature cookbook (`COOKBOOK.md`) was merged
+  into `README.md` — since the repo is a cookbook, its README now *is* the
+  cookbook: quickstart up top, then the recipes and reference material, with a
+  table of contents. `COOKBOOK.md` was deleted.
+- Folded the duplicated file map / data contract / adaptation guidance into single
+  README sections (the file map appeared in three docs before).
+- Compacted `project_overview.md` to only the agent-coordination content
+  (active-vs-legacy, tests/fixtures, open questions) plus a pointer block into the
+  README sections; removed the parts the README now covers.
+- Updated the `COOKBOOK.md` pointer in `AGENTS.md` to reference the README.
+- Verification:
+  - `treaty validate .` -> `Treaty validation passed.`
+  - Confirmed no remaining `COOKBOOK.md` references except the historical work-log
+    entry below.
+
 ### Initial template build + treaty adoption (claude-fable-5)
 
 - Created this repository as a standalone, domain-neutral template distilled from

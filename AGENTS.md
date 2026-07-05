@@ -205,7 +205,7 @@ Do not mention tests, docs, project memory updates, or behind-the-scenes impleme
 
 ## Project-Specific Reminders
 
-These are the things that aren't obvious from reading the code and that an agent would otherwise have to learn the hard way. `COOKBOOK.md` explains all of them in depth.
+These are the things that aren't obvious from reading the code and that an agent would otherwise have to learn the hard way. The `README.md` (this repo is the cookbook) explains all of them in depth in its per-feature recipes.
 
 - The shared x-axis id and overlay trace indices are **not** hardcoded. `ts_app/figure.py` publishes them in `figure.layout.meta` (`sharedXAxisKey`, `overlayTraceIndices`, `xBounds`, `numClass`, `frameRate`), and every `ts_app/assets/*.js` reads from there — so a different channel count needs no JS edits. If you rename a meta key, update every asset reader.
 - The annotation overlay is a heatmap and needs a **2-D `z`** (`(1, N)`, never `(N,)`).
