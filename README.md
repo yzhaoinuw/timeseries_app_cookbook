@@ -1,5 +1,7 @@
 # Time Series App Cookbook
 
+[![Agent Collab Treaty](https://raw.githubusercontent.com/yzhaoinuw/agent_collab_treaty/main/assets/treaty-adopted.svg)](https://github.com/yzhaoinuw/agent_collab_treaty)
+
 A **domain-neutral, runnable template** for building interactive Dash + Plotly
 desktop apps that let a user navigate, inspect, and annotate **long time series**
 smoothly — even at millions of points — using [`plotly-resampler`](https://github.com/predict-idlab/plotly-resampler).
@@ -98,10 +100,20 @@ and `data.py` (your loader) for most apps; the interaction layer
 and overlay trace indices are published in `figure.layout.meta`, the JavaScript
 adapts to a different channel count without edits.
 
+## Real-world example
+
+This template is distilled from **[Sleep Scoring App](https://github.com/yzhaoinuw/sleep_scoring)**,
+a production desktop app for annotating multi-hour EEG/EMG recordings. To see
+these recipes carrying a real domain — a spectrogram panel, model-assisted
+prediction, video-clip playback, and a MATLAB `.mat` data contract — read its
+`app_src/` alongside this template. The interaction layer is the same; this repo
+strips it to the reusable, domain-neutral core.
+
 ## Provenance & license
 
-Distilled from a production desktop time-series annotation app. The interaction
-patterns (coalesced navigation, direct restyle, auto-pan drag-select) are the
-transferable innovations this template exists to share.
+The interaction patterns here (coalesced navigation, direct restyle, auto-pan
+drag-select, keypress annotation) are the transferable innovations this template
+exists to share — see [Real-world example](#real-world-example) for the app they
+were distilled from.
 
 Released under the MIT License — see [`LICENSE`](LICENSE).
