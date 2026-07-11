@@ -41,6 +41,36 @@ Keep the parenthetical compact. Examples:
 Newest entry goes on top. If the session did multiple distinct pieces of work, use multiple `###` subsections under one `##` date header.
 -->
 
+## 2026-07-10
+
+### Multi-session support ported from the reference app (claude-fable-5)
+
+- Ported the reference app's (sleep_scoring) multi-session architecture into the
+  template: up to three independent desktop windows, one process per window.
+  `run_desktop_app.py` now claims a port slot (`BASE_PORT` 8060–8062) before
+  importing `ts_app` and exports `TS_APP_INSTANCE_SLOT` / `TS_APP_PEER_PORTS`;
+  `ts_app/config.py` reads them at import time (defaults preserve single-window
+  behavior for tests/scripts/--smoke); `ts_app/app.py` namespaces the temp/cache
+  dir by slot, tracks the process-local current file, serves
+  `/_ts_app/current-file` for peers, and refuses a file already open in another
+  window. Later windows get a numbered title and profiling forced off.
+- Left out the reference app's updater peer-guards, legacy temp adoption, and
+  per-slot video dirs — the template has no updater, no installed base, and no
+  video feature. The updater-exclusion pattern is noted in the recipe's Adapt
+  section instead.
+- Documented it as README Recipe 17 (new Multi-session group) and threaded it
+  through the contents, recipe index, recipes 1/3/4, adaptation checklist,
+  gotcha catalog, and source-file map. Added the launcher/env-contract reminder
+  to `AGENTS.md` and the new test file to `project_overview.md`.
+- Config change: `PORT` moved out of `ts_app/config.py` into the launcher as
+  `BASE_PORT` — the slot must be claimed before `ts_app` can be imported, so
+  config cannot own it.
+- Verification:
+  - `python -m pytest -q` — 26 passed (8 smoke + 18 new multi-session tests
+    covering slot claiming, the env contract, the current-file endpoint,
+    peer lookup, and the choose_file refusal)
+  - `python run_desktop_app.py --smoke` — OK
+
 ## 2026-07-05
 
 ### Doc reconciliation: merge cookbook into README (claude-fable-5)

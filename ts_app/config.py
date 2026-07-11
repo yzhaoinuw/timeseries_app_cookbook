@@ -18,7 +18,8 @@ WINDOW_CONFIG = {
     "min_size": (1200, 800),
     "resizable": True,
 }
-PORT = 8060
+# The port slot range (BASE_PORT, MAX_SESSIONS) lives in run_desktop_app.py:
+# it must be known before ts_app is imported, so it can't live here.
 
 # %% Annotation classes
 # The overlay is one integer class per label frame. Change these lists to your
@@ -56,3 +57,34 @@ LABEL_FRAME_RATE = 1.0  # label frames per second (1 Hz = one class per second)
 
 # %% Profiling (off by default; opt in with env var)
 PROFILE_NAVIGATION = os.environ.get("TS_APP_PROFILE_NAV", "0") == "1"
+
+# %% Multi-session (see COOKBOOK recipe 17)
+# run_desktop_app.py claims a window slot (one port per app window) and
+# exports these env vars before ts_app is imported. Direct imports (tests,
+# scripts, --smoke) see no env vars and default to slot 0 with no peers —
+# exactly the single-window behavior.
+
+
+def _read_instance_slot():
+    try:
+        return max(0, int(os.environ.get("TS_APP_INSTANCE_SLOT", "0")))
+    except ValueError:
+        return 0
+
+
+def _read_peer_ports():
+    ports = []
+    for token in os.environ.get("TS_APP_PEER_PORTS", "").split(","):
+        token = token.strip()
+        if token.isdigit():
+            ports.append(int(token))
+    return ports
+
+
+INSTANCE_SLOT = _read_instance_slot()
+PEER_PORTS = _read_peer_ports()
+
+if INSTANCE_SLOT > 0:
+    # Profiling stays on the first window only; later windows would
+    # interleave their output with the first window's stream.
+    PROFILE_NAVIGATION = False

@@ -25,7 +25,7 @@ large signals).
 - [Quickstart](#quickstart)
 - [Plugging in your own data](#plugging-in-your-own-data)
 - [The one big idea](#the-one-big-idea) · [How to read a recipe](#how-to-read-a-recipe) · [Recipe Index](#recipe-index)
-- Recipes — [Skeleton](#skeleton) (1–5) · [The bridge](#the-bridge) (6) · [Navigation](#navigation) (7–10) · [Annotation](#annotation) (11–16)
+- Recipes — [Skeleton](#skeleton) (1–5) · [The bridge](#the-bridge) (6) · [Navigation](#navigation) (7–10) · [Annotation](#annotation) (11–16) · [Multi-session](#multi-session) (17)
 - [Cross-cutting patterns](#cross-cutting-patterns) · [Adaptation checklist](#adaptation-checklist) · [Gotcha catalog](#gotcha-catalog) · [Source-file map](#source-file-map)
 - [Real-world example](#real-world-example) · [Provenance & license](#provenance--license)
 
@@ -44,6 +44,9 @@ large signals).
 - **Undo** (one step) and **crash recovery** (reopen the same file to salvage
   unsaved labels).
 - **Native Open/Save dialogs** and CSV segment export.
+- **Multiple independent windows** — launch the app again for a second (or third)
+  window, each in its own process with its own state; a file already open in one
+  window is refused in another.
 
 ## Quickstart
 
@@ -123,7 +126,8 @@ the slow path.
 │   ├─ data contract         (data.py, labels.py)                   │
 │   ├─ server-side cache     (flask_caching filesystem)             │
 │   ├─ server callbacks      (load, resample-patch, undo, save)     │
-│   └─ raw Flask routes      (/resample, /profile-log)              │
+│   └─ raw Flask routes      (/resample, /profile-log,              │
+│                             /current-file)                        │
 ├─────────────────────────────────────────────────────────────────┤
 │  Browser interaction layer                                        │  browser
 │   ├─ clientside callbacks  (inline JS in app.py)                  │
@@ -174,6 +178,10 @@ the slow path.
 15. [Undo & crash recovery](#recipe-15--undo--crash-recovery)
 16. [Saving & export](#recipe-16--saving--export)
 
+**Multi-session — multiple independent desktop windows:**
+
+17. [Multi-session desktop windows](#recipe-17--multi-session-desktop-windows)
+
 **Reference:** [Cross-cutting patterns](#cross-cutting-patterns) · [Adaptation checklist](#adaptation-checklist) · [Gotcha catalog](#gotcha-catalog) · [Source-file map](#source-file-map)
 
 ---
@@ -186,11 +194,15 @@ the slow path.
 
 **Depends on.** Nothing (outermost layer).
 
-**Source.** `run_desktop_app.py`, `ts_app/config.py` (`WINDOW_CONFIG`, `PORT`),
-`ts_app/assets/closeWindow.js`.
+**Source.** `run_desktop_app.py` (`BASE_PORT`, `MAX_SESSIONS`), `ts_app/config.py`
+(`WINDOW_CONFIG`), `ts_app/assets/closeWindow.js`.
 
-**Mechanism.** The Dash/Flask server runs on `127.0.0.1:PORT` in a **daemon
-thread**; `webview.create_window(...)` opens a native window pointed at that URL.
+**Mechanism.** The Dash/Flask server runs on `127.0.0.1:<port>` in a **daemon
+thread**. The port comes from a **window-slot claim**: the launcher binds the
+first free port in `BASE_PORT..BASE_PORT+MAX_SESSIONS-1` and holds the socket
+until the server takes the port over, which is what lets several independent
+windows coexist (Recipe 17 covers the full contract).
+`webview.create_window(...)` opens a native window pointed at that URL.
 `webview.windows[0]` is the handle the server later uses to raise native file
 dialogs (Recipe 4) — the one thing a plain browser can't do. On Windows the app
 forces the EdgeChromium renderer. `closeWindow.js` installs an `onbeforeunload`
@@ -253,6 +265,10 @@ that survives across callbacks and even an app restart.
 1. **`flask_caching` filesystem cache** for JSON-ish state: `filepath`,
    `filename`, and `labels_history` (a `deque(maxlen=2)`; Recipe 15). The `~20-day`
    timeout + filesystem backend is what turns label history into crash recovery.
+   The cache dir is namespaced by window slot (`slot_0`, `slot_1`, …; Recipe 17).
+   The file *currently open in this process* is tracked separately in
+   `_current_filepath` — a persisted cache value is recovery state, not proof
+   that a restarted window still has that file open.
 2. **A module-global `FIG_RESAMPLER`** for the one thing that can't be cached: the
    live `FigureResampler` object. It holds the full-resolution signal and is read
    on every zoom/pan and every auto-pan fetch, so serializing it per interaction
@@ -264,7 +280,8 @@ state → filesystem cache (which also gives you free persistence).
 
 **Adapt.** For multi-file/multi-tab, replace the single global with a dict keyed
 by session id and add eviction. This template shows one recording at a time by
-design.
+design; Recipe 17 scales to multiple *windows* by isolating these globals in
+separate processes instead.
 
 **Gotchas.** **`np.nan` becomes `None` when read back from the filesystem cache.**
 The code accounts for this (`equal_nan=True` comparisons, `== None` handling in
@@ -283,7 +300,8 @@ render. Same idea for Save.
 
 **Mechanism.** The load is a **two-callback handoff** through a store:
 1. `load_demo` / `choose_file` (fire on a button) obtain a file path — the demo
-   generates + saves a synthetic recording; "Open file…" raises a native dialog —
+   generates + saves a synthetic recording; "Open file…" raises a native dialog
+   and refuses a file that is already open in a peer window (Recipe 17) —
    call `initialize_state`, write an ack message, and set `visualization-ready-store`.
 2. `create_visualization` (fires on that store) loads via `load_recording`,
    salvages/initializes label history, builds the figure (`create_fig`), assigns
@@ -703,6 +721,81 @@ before saving. Guard the button's initial fire.
 
 ---
 
+## Multi-session
+
+### Recipe 17 — Multi-session desktop windows
+
+**Goal.** Run up to three independent app windows on one computer without shared
+callback globals, cache/temp-file collisions, or the same recording open twice.
+
+**Depends on.** Recipe 1 (the launcher), Recipe 3 (cache and process globals),
+Recipe 4 (file loading).
+
+**Source.** `run_desktop_app.py` (`BASE_PORT`, `MAX_SESSIONS`,
+`claim_session_slot`); `ts_app/config.py` (`INSTANCE_SLOT`, `PEER_PORTS`); in
+`ts_app/app.py`: the per-slot `TEMP_PATH`, `set_/get_current_filepath`,
+`find_peer_session_with_file`, the `/_ts_app/current-file` route, and the peer
+check in `choose_file`. Regression coverage: `tests/test_multi_session.py`.
+
+**Mechanism.** One **process per window**; a tiny port-slot protocol handles only
+the cross-process concerns:
+
+1. **Claim a slot before importing `ts_app`.** `claim_session_slot()` binds the
+   first free port in `BASE_PORT..BASE_PORT+MAX_SESSIONS-1` and holds the socket
+   until the Dash server takes the port over, so two launchers can't race onto
+   the same slot. The OS port table doubles as the "how many windows are open"
+   counter — no lock files, and a crashed window frees its slot automatically.
+   If every slot is bound, a small pywebview notice explains the window limit.
+2. **Export the process identity.** Before any `ts_app` import, the launcher
+   writes `TS_APP_INSTANCE_SLOT` and `TS_APP_PEER_PORTS`; `ts_app/config.py`
+   reads them once at import time. Missing env vars mean slot 0 with no peers —
+   exactly the single-window behavior, so tests, scripts, and `--smoke` need no
+   changes. This is also why the slot range lives in the launcher: config can't
+   provide a value that must be known before config is imported.
+3. **Namespace disk state by slot.** `TEMP_PATH` (and with it the filesystem
+   cache and temp exports) becomes `…/ts_app_data/slot_<N>`. Ordinary module
+   globals — the Dash app, `FIG_RESAMPLER`, the components — need nothing:
+   separate processes isolate them for free.
+4. **Separate recovery state from live state.** Cache entries persist across
+   restarts on purpose (crash recovery, Recipe 15). The `/current-file` peer
+   endpoint therefore reports the process-local `_current_filepath` (initially
+   `None`), never the cached `filepath` — otherwise a restarted blank window
+   would falsely claim its previous recording.
+5. **Refuse a file already open in a peer.** Before `initialize_state`,
+   `choose_file` queries each peer port's `/_ts_app/current-file` with a short
+   timeout. Only a response identifying itself as this app counts; paths are
+   normalized before comparison; a match returns a user-facing refusal. Dead
+   windows stop answering, so a crashed window's claim evaporates with it.
+
+**Why.** A session-aware Dash server would need every cache key, component
+singleton, resampler global, callback, and generated artifact to carry a session
+id. One process per window lets the operating system do the isolation, leaving
+only identity, capacity, and same-file detection to the port-slot protocol.
+
+**Adapt.**
+- Change `BASE_PORT` / `MAX_SESSIONS` together in the launcher; window titles,
+  peer ports, and slot dirs all derive from them.
+- Namespace any new generated-artifact directory or persistent cache by slot too
+  (the reference app does this for its per-window video-clip folders).
+- If your launcher does pre-import work that patches the package on disk (e.g. a
+  startup auto-updater), make it atomic against new windows by binding *all*
+  peer ports for the duration — the reference app's launcher shows the pattern.
+- For a browser-hosted multi-user deployment, do **not** copy this
+  port-per-window design; use authenticated session ids and session-keyed state.
+
+**Gotchas.**
+- **Port occupancy is a bind question, not a connection question.** A starting
+  peer owns a bound socket before it listens; `socket.create_connection()` would
+  miss it. Probe with `bind`.
+- **Persistent is not active.** Recovery cache keys may be days old; peer
+  coordination must use process-local state (point 4 above).
+- Any unrelated process holding a slot port reduces window capacity. This is
+  intentionally conservative.
+- The same-file check is advisory, not an atomic lock: two selections made at
+  the same instant can both pass. The accepted race avoids stale lock files.
+
+---
+
 ## Cross-cutting patterns
 
 - **Clientside for feel, serverside for data.** If an interaction can run from
@@ -746,6 +839,9 @@ before saving. Guard the button's initial fire.
    long selections) → keypress labeling (14) → undo (15). All converge on one
    store and one label array.
 7. **Save/export** (16) as needed.
+8. **Multi-session** (17), if users open several recordings side by side: pick
+   the slot range in the launcher, namespace every persistent/generated path by
+   slot, and keep recovery state separate from live state.
 
 **Minimum viable viewer** (no annotation): Recipes 1–8 — a fast, zoomable,
 pannable multi-channel viewer on huge signals.
@@ -773,6 +869,10 @@ pannable multi-channel viewer on huge signals.
 - **Clear `selections`/`shapes`** when leaving select mode or after labeling
   (Recipes 11, 14).
 - **Sentinel round-trip**: unscored is `-1` on disk, `NaN` in display (Recipes 5, 16).
+- **A bound port may not be listening yet.** Detect peer windows with bind
+  attempts, not connections (Recipe 17).
+- **Persistent cache state is not live process state.** Never report a recovered
+  filepath as a window's current file after a restart (Recipe 17).
 
 ---
 
@@ -780,9 +880,10 @@ pannable multi-channel viewer on huge signals.
 
 | Concern | File |
 | --- | --- |
-| Desktop shell / entrypoint | `run_desktop_app.py` |
-| Config (window, classes, flags) | `ts_app/config.py` |
+| Desktop shell / entrypoint, window-slot claim | `run_desktop_app.py` |
+| Config (window, classes, flags, session slot env) | `ts_app/config.py` |
 | Dash app, callbacks, Flask routes, cache | `ts_app/app.py` |
+| Multi-session coordination | `run_desktop_app.py`, `ts_app/config.py`, `ts_app/app.py` |
 | Layout, stores, EventListeners | `ts_app/components.py` |
 | Figure builder (resampler + overlay) | `ts_app/figure.py` |
 | Data contract, synthetic gen, loader | `ts_app/data.py` |
@@ -795,6 +896,7 @@ pannable multi-channel viewer on huge signals.
 | Context-menu select | `ts_app/assets/graphContextMenu.js` |
 | Exit guard | `ts_app/assets/closeWindow.js` |
 | Smoke tests (data/figure/label/routes) | `tests/test_smoke.py` |
+| Multi-session tests (slots/peers/refusal) | `tests/test_multi_session.py` |
 
 For agent-coordination context (active-vs-legacy notes, test/fixture details, open
 questions), see [`project_overview.md`](project_overview.md).

@@ -9,11 +9,13 @@ The guiding split: anything that must feel instant runs in the browser
 """
 
 import json
+import os
 import shutil
 import tempfile
 import time
 from collections import deque
 from pathlib import Path
+from urllib.request import urlopen
 
 import dash
 import dash_bootstrap_components as dbc
@@ -30,6 +32,8 @@ from ts_app.components import Components
 from ts_app.config import (
     APP_TITLE,
     ENABLE_DIRECT_PLOTLY_RESTYLE,
+    INSTANCE_SLOT,
+    PEER_PORTS,
     PROFILE_NAVIGATION,
     SAMPLING_LEVELS,
 )
@@ -58,7 +62,9 @@ app = Dash(
 )
 app.layout = components.home_div
 
-TEMP_PATH = Path(tempfile.gettempdir()) / "ts_app_data"
+# Each app window is its own process on its own slot (Recipe 17); a per-slot
+# dir keeps the windows' caches and temp exports from clobbering each other.
+TEMP_PATH = Path(tempfile.gettempdir()) / "ts_app_data" / f"slot_{INSTANCE_SLOT}"
 TEMP_PATH.mkdir(parents=True, exist_ok=True)
 
 # The one big hot in-memory object: the resampler figure (holds full-res data).
@@ -170,6 +176,51 @@ def build_direct_restyle_payload(update_patch):
 
 
 # %% cache / session state ----------------------------------------------------
+PEER_QUERY_TIMEOUT_SECONDS = 0.5
+
+# The file open in this window, reported by the peer current-file endpoint.
+# Process state, not the filesystem cache: cache entries persist across
+# restarts of a slot, and a stale filepath would make peers refuse a file
+# that is no longer open anywhere (Recipe 17).
+_current_filepath = None
+
+
+def set_current_filepath(filepath):
+    global _current_filepath
+    _current_filepath = filepath
+
+
+def get_current_filepath():
+    return _current_filepath
+
+
+def _normalize_path(filepath):
+    return os.path.normcase(os.path.normpath(os.path.abspath(filepath)))
+
+
+def find_peer_session_with_file(filepath):
+    """Return the port of a live app window that already has filepath open.
+
+    Dead windows stop answering their port, so a crashed window's claim on a
+    file evaporates with it; no lock files are involved. Anything else bound
+    to a peer port is ignored unless it identifies as this app.
+    """
+    target = _normalize_path(filepath)
+    for port in PEER_PORTS:
+        url = f"http://127.0.0.1:{port}/_ts_app/current-file"
+        try:
+            with urlopen(url, timeout=PEER_QUERY_TIMEOUT_SECONDS) as response:
+                payload = json.load(response)
+        except (OSError, ValueError):
+            continue
+        if not isinstance(payload, dict) or payload.get("app") != "ts_app":
+            continue
+        peer_file = payload.get("filepath")
+        if peer_file and _normalize_path(peer_file) == target:
+            return port
+    return None
+
+
 def clear_temp_artifacts(keep_stem):
     for temp_file in TEMP_PATH.iterdir():
         if temp_file.suffix in (".npz", ".csv") and temp_file.stem != keep_stem:
@@ -180,6 +231,7 @@ def clear_temp_artifacts(keep_stem):
 
 
 def initialize_state(filepath):
+    set_current_filepath(filepath)
     cache.set("filepath", filepath)
     prev_filename = cache.get("filename")
     filename = Path(filepath).stem
@@ -200,6 +252,16 @@ def recording_metadata(recording):
 
 
 # %% Flask routes (lowest-latency data paths) ---------------------------------
+@app.server.get("/_ts_app/current-file")
+def current_file():
+    """Report which file this window has open, for peer same-file checks.
+
+    Reads process state rather than the filesystem cache so a freshly
+    restarted window never reports the previous run's file (Recipe 17).
+    """
+    return {"app": "ts_app", "filepath": get_current_filepath() or ""}
+
+
 @app.server.get("/_ts_app/resample")
 def resample_graph_data():
     """Return a resampler data patch for a given x-range, for direct browser
@@ -612,6 +674,13 @@ def choose_file(n_clicks):
     selected = open_file_dialog(("Recordings (*.npz)",))
     if selected is None:
         raise PreventUpdate
+    if find_peer_session_with_file(selected) is not None:
+        message = (
+            f'"{Path(selected).name}" is already open in another {APP_TITLE} '
+            "window. Please select a different file, or close it in the other "
+            "window first."
+        )
+        return message, dash.no_update
     initialize_state(selected)
     return "Loading… this may take a few seconds.", "vis"
 

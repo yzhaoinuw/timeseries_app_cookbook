@@ -31,7 +31,12 @@ side alone.
 
 - [`tests/test_smoke.py`](tests/test_smoke.py) — covers the data contract, figure
   build + `meta` wiring, the resampler patch path, `.npz` round-trip, and label
-  helpers. Run with `python -m pytest -q` (8 tests).
+  helpers.
+- [`tests/test_multi_session.py`](tests/test_multi_session.py) — covers the
+  window-slot claim, the `TS_APP_INSTANCE_SLOT`/`TS_APP_PEER_PORTS` env contract,
+  the `/_ts_app/current-file` endpoint (process-local, not cached), the peer
+  same-file lookup, and the `choose_file` refusal.
+- Run everything with `python -m pytest -q` (26 tests).
 - Fixtures are generated, not stored: `generate_synthetic_recording()` in
   `ts_app/data.py` is the canonical sample data. No data files are committed.
 - The browser JS interaction layer is **not** unit-tested. Verify it by running
