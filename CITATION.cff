@@ -1,0 +1,42 @@
+cff-version: 1.2.0
+title: "timeseries_app_cookbook: A runnable template and recipe book for building interactive desktop apps that navigate and annotate long time series"
+message: "If you use this software, please cite it using the metadata from this file."
+type: software
+authors:
+  - given-names: Yue
+    family-names: Zhao
+    affiliation: "University of Rochester, Rochester, NY, USA"
+    orcid: "https://orcid.org/0000-0002-0819-5012"
+abstract: >-
+  A domain-neutral, runnable template for building interactive Dash and Plotly
+  desktop applications that navigate, inspect, and annotate long time series
+  smoothly, including recordings of millions of samples, using
+  plotly-resampler. It is distilled from a production biomedical scoring
+  application with every domain-specific detail removed, so that the signals
+  shipped with it are synthetic and the reusable techniques are the substance:
+  resampler-backed navigation, event coalescing for responsive panning and
+  zooming, drag-to-select with automatic panning, keyboard annotation, undo,
+  crash recovery, and running several recordings side by side. Adapting it to
+  a new data type requires replacing one data-loading function and one
+  configuration file. The accompanying README is written as a cookbook of
+  numbered recipes, each pointing at the exact source file that implements it,
+  and is intended to be read both by human developers and by coding agents
+  adapting the template to a new scientific domain.
+repository-code: "https://github.com/yzhaoinuw/timeseries_app_cookbook"
+license: MIT
+keywords:
+  - time series
+  - data visualization
+  - annotation
+  - desktop application
+  - Dash
+  - Plotly
+  - research software
+  - scientific software template
+# TODO after the first GitHub Release is published (which is what triggers
+# Zenodo to mint the DOI):
+#   1. Add the Zenodo *concept* DOI here as `doi: "10.5281/zenodo.XXXXXXXX"`.
+#      The concept DOI resolves to the newest release, so it stays correct
+#      without further editing; per-release DOIs are reachable from that record.
+#   2. Add the matching DOI badge to README.md (see the Citation section).
+#   3. Set `version:` and `date-released:` to match the tag that was released.

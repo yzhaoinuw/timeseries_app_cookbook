@@ -27,7 +27,7 @@ large signals).
 - [The one big idea](#the-one-big-idea) · [How to read a recipe](#how-to-read-a-recipe) · [Recipe Index](#recipe-index)
 - Recipes — [Skeleton](#skeleton) (1–5) · [The bridge](#the-bridge) (6) · [Navigation](#navigation) (7–10) · [Annotation](#annotation) (11–16) · [Multi-session](#multi-session) (17)
 - [Cross-cutting patterns](#cross-cutting-patterns) · [Adaptation checklist](#adaptation-checklist) · [Gotcha catalog](#gotcha-catalog) · [Source-file map](#source-file-map)
-- [Real-world example](#real-world-example) · [Provenance & license](#provenance--license)
+- [Real-world example](#real-world-example) · [Citation](#citation) · [Provenance & license](#provenance--license)
 
 ## What you get
 
@@ -911,6 +911,21 @@ these recipes carrying a real domain — a spectrogram panel, model-assisted
 prediction, video-clip playback, and a MATLAB `.mat` data contract — read its
 `app_src/` alongside this template. The interaction layer is the same; this repo
 strips it to the reusable, domain-neutral core.
+
+## Citation
+
+If you build on this template in research, use GitHub's **Cite this repository**
+button or the [CITATION.cff](CITATION.cff) file to obtain an APA or BibTeX entry.
+
+<!-- After the first GitHub Release is published and Zenodo mints the DOI, add the
+     DOI badge under the title at the top of this README, and replace this comment
+     block with the paragraph below, filling in the concept DOI:
+
+Each release is archived on Zenodo. Cite the concept DOI
+[10.5281/zenodo.XXXXXXXX](https://doi.org/10.5281/zenodo.XXXXXXXX), which resolves
+to the newest release; use a release's own DOI only when you need to pin the exact
+version you ran.
+-->
 
 ## Provenance & license
 
