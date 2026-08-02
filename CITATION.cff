@@ -17,13 +17,17 @@ abstract: >-
   resampler-backed navigation, event coalescing for responsive panning and
   zooming, drag-to-select with automatic panning, keyboard annotation, undo,
   crash recovery, and running several recordings side by side. Adapting it to
-  a new data type requires replacing one data-loading function and one
-  configuration file. The accompanying README is written as a cookbook of
-  numbered recipes, each pointing at the exact source file that implements it,
-  and is intended to be read both by human developers and by coding agents
-  adapting the template to a new scientific domain.
+  a new data type is deliberately narrow work, centered on one data-loading
+  function and one configuration file. The accompanying README is written as a
+  cookbook of numbered recipes, each pointing at the source file that
+  implements it, so that the template can be adapted recipe by recipe rather
+  than by reverse-engineering the application; this structure suits both human
+  developers and automated coding tools.
 repository-code: "https://github.com/yzhaoinuw/timeseries_app_cookbook"
 license: MIT
+# Matches VERSION in ts_app/__init__.py. Keep the two in step, and tag the
+# release to match.
+version: 0.1.0
 keywords:
   - time series
   - data visualization
@@ -39,4 +43,5 @@ keywords:
 #      The concept DOI resolves to the newest release, so it stays correct
 #      without further editing; per-release DOIs are reachable from that record.
 #   2. Add the matching DOI badge to README.md (see the Citation section).
-#   3. Set `version:` and `date-released:` to match the tag that was released.
+#   3. Add `date-released:` and confirm `version:` still matches both the tag and
+#      VERSION in ts_app/__init__.py.
