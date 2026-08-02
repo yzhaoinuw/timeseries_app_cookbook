@@ -1,6 +1,7 @@
 # Time Series App Cookbook
 
 [![Agent Collab Treaty](https://raw.githubusercontent.com/yzhaoinuw/agent_collab_treaty/main/assets/treaty-adopted.svg)](https://github.com/yzhaoinuw/agent_collab_treaty)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21763327.svg)](https://doi.org/10.5281/zenodo.21763327)
 
 A **domain-neutral, runnable template** for building interactive Dash + Plotly
 desktop apps that navigate, inspect, and annotate **long time series** smoothly —
@@ -917,15 +918,10 @@ strips it to the reusable, domain-neutral core.
 If you build on this template in research, use GitHub's **Cite this repository**
 button or the [CITATION.cff](CITATION.cff) file to obtain an APA or BibTeX entry.
 
-<!-- After the first GitHub Release is published and Zenodo mints the DOI, add the
-     DOI badge under the title at the top of this README, and replace this comment
-     block with the paragraph below, filling in the concept DOI:
-
 Each release is archived on Zenodo. Cite the concept DOI
-[10.5281/zenodo.XXXXXXXX](https://doi.org/10.5281/zenodo.XXXXXXXX), which resolves
+[10.5281/zenodo.21763327](https://doi.org/10.5281/zenodo.21763327), which resolves
 to the newest release; use a release's own DOI only when you need to pin the exact
 version you ran.
--->
 
 ## Acknowledgment
 

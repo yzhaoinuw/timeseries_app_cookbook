@@ -37,11 +37,7 @@ keywords:
   - Plotly
   - research software
   - scientific software template
-# TODO after the first GitHub Release is published (which is what triggers
-# Zenodo to mint the DOI):
-#   1. Add the Zenodo *concept* DOI here as `doi: "10.5281/zenodo.XXXXXXXX"`.
-#      The concept DOI resolves to the newest release, so it stays correct
-#      without further editing; per-release DOIs are reachable from that record.
-#   2. Add the matching DOI badge to README.md (see the Citation section).
-#   3. Add `date-released:` and confirm `version:` still matches both the tag and
-#      VERSION in ts_app/__init__.py.
+# Zenodo concept DOI. It resolves to the newest release, so it stays correct
+# without editing; the per-release DOIs are reachable from that record.
+doi: "10.5281/zenodo.21763327"
+date-released: "2026-08-02"
