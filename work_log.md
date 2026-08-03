@@ -41,6 +41,46 @@ Keep the parenthetical compact. Examples:
 Newest entry goes on top. If the session did multiple distinct pieces of work, use multiple `###` subsections under one `##` date header.
 -->
 
+## 2026-08-03
+
+### Legend overlap + right-click segment selection fixes; released v0.1.1 (claude-opus-5)
+
+- Moved the class legend out of the first subplot. It sat at `y=1.02` with the
+  default `yanchor="auto"`, which Plotly resolves to `"top"` for `y >= 2/3`, so
+  the swatch row hung *downward* into row 1 and landed on the same line as the
+  first subplot title. It is now anchored to the figure **container** and
+  right-aligned in the top margin, opposite the plot title, so its position no
+  longer depends on the plot area or the figure height.
+- Fixed intermittent right-click segment selection: about half the time a
+  right-click selected a thin strip instead of the segment. Plotly's click
+  handler runs for the right button too, so the press landed a `plotly_click` in
+  `clickData` on mouseup and `read_click_select` overwrote the segment box.
+  `graphContextMenu.js` now swallows the right-button press in the capture phase
+  (`stopPropagation` only — `preventDefault` on `mousedown` would cancel
+  `contextmenu` in WebKit, which is the event the feature needs).
+- Fixed the same class of bug for ctrl+left-click, the macOS secondary click:
+  `annotationAutoPan.js` `beginDrag` now ignores ctrl-held presses, which
+  otherwise dispatched a `kind: "click"` selection on pointerup that replaced
+  the segment the right-click had just selected.
+- Evidence worth keeping: Plotly's `dragElement.onDone` calls
+  `clickFn` unconditionally — its right-click flag only suppresses the synthetic
+  `click` re-dispatch (confirmed in the bundled `plotly.min.js`). That is why
+  the failure was intermittent rather than constant: Plotly emits the click only
+  when it has live hover data, and skips `clickFn` entirely when the press
+  jittered past the drag threshold. Both gotchas are now written into README
+  recipes 12 and 13.
+- Both fixes were ported to the reference app (`sleep_scoring`), which had them
+  verbatim; that work went out as a PR against its `dev` branch.
+- Released as **v0.1.1** (`VERSION`, `CITATION.cff` version + `date-released`).
+- Verification:
+  - `python -m pytest -q` → 26 passed
+  - `python run_desktop_app.py --smoke` → `Time Series Annotator 0.1.1 smoke check OK`
+  - Legend placement checked by rendering `build_figure` to PNG via kaleido
+    before/after and comparing the top band; no static test covers it.
+  - The right-click gesture was verified by hand in the running app by the user
+    (the `ts_app/assets/*.js` gesture layer still has no automated coverage —
+    see the standing `next_steps.md` item on browser-side interaction tests).
+
 ## 2026-07-10
 
 ### Multi-session support ported from the reference app (claude-fable-5)

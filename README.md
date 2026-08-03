@@ -605,6 +605,19 @@ single-frame fix, or "relabel this whole segment." Funneling all three into one
 **Gotchas.** Integer rounding has an edge case when `start === end`; the code
 expands to a full frame deliberately. All three gate on select mode.
 
+The right-click path has to keep Plotly out of the way, or the three methods
+fight each other. Plotly starts its drag/click machinery from `mousedown` on the
+drag layer, and its click handler runs for the **right** button too — the
+right-click flag only suppresses a synthetic `click` re-dispatch. Left alone, a
+right-click lands a `plotly_click` in `clickData` on mouseup and
+`read_click_select` overwrites the segment box with its thin neighborhood strip.
+It presents as an *intermittent* failure, because Plotly only emits the click
+when it has live hover data and skips it entirely when the press jittered past
+the drag threshold. `graphContextMenu.js` therefore swallows the right-button
+press in the capture phase, the same way Recipe 13 swallows the left-button one.
+Use `stopPropagation` only — `preventDefault` on `mousedown` cancels
+`contextmenu` in WebKit, which is the event the whole recipe runs on.
+
 ---
 
 ### Recipe 13 — Drag-to-select with auto-pan
@@ -649,7 +662,10 @@ buffer fractions. Needs the raw route (Recipe 8) and `meta.xBounds` (Recipe 5).
 release delay) or relayouts fight. Single-flight + the stale-guard
 (`requestId < latestAppliedTraceRequestId`) prevent request pileup and out-of-order
 application — keep both. `CLICK_PX` decides click vs drag so a stationary press
-still selects a neighborhood.
+still selects a neighborhood. `beginDrag` ignores ctrl-held presses: ctrl+left
+is the macOS secondary click, so it raises `contextmenu`, and without the guard
+the pointerup would dispatch a `kind: "click"` selection that replaces the
+segment Recipe 12 just selected.
 
 ---
 

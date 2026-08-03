@@ -49,6 +49,33 @@
         return nearest ? nearest._id : "y";
     }
 
+    // Keep Plotly out of the right-click path. Plotly starts its drag/click
+    // machinery from `mousedown` on the drag layer, and its `clickFn` runs for
+    // the right button too (the right-click flag only suppresses the synthetic
+    // `click` re-dispatch). Left alone, the press lands a `plotly_click` in
+    // `clickData` on mouseup and the bare-click callback overwrites the segment
+    // box selected below — intermittently, because Plotly only emits the click
+    // when it has live hover data. Swallowing the press in the capture phase
+    // stops that at the source, the same way `annotationAutoPan` swallows the
+    // left-button press.
+    //
+    // stopPropagation only: `preventDefault` on mousedown cancels `contextmenu`
+    // in WebKit (the pywebview runtime on macOS), which is the event we need.
+    // ctrlKey is here because ctrl+left-click is the macOS secondary click.
+    document.addEventListener(
+        "mousedown",
+        function (event) {
+            if (event.button !== 2 && !event.ctrlKey) {
+                return;
+            }
+            const root = event.target.closest ? event.target.closest(`#${GRAPH_ID}`) : null;
+            if (root) {
+                event.stopPropagation();
+            }
+        },
+        true
+    );
+
     document.addEventListener(
         "contextmenu",
         function (event) {
