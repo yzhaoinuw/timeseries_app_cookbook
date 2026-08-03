@@ -21,6 +21,7 @@ large signals).
 ## Contents
 
 - [What you get](#what-you-get)
+- [How this compares](#how-this-compares)
 - [Quickstart](#quickstart)
 - [Plugging in your own data](#plugging-in-your-own-data)
 - **The Cookbook**
@@ -60,6 +61,29 @@ large signals).
 - **Multiple independent windows** — launch the app again for a second (or third)
   window, each in its own process with its own state; a file already open in one
   window is refused in another.
+
+## How this compares
+
+Two other routes exist for labeling time series, and both are good at what
+they aim for:
+
+- **[Label Studio](https://labelstud.io/templates/time_series)** — a general
+  annotation platform with real multichannel time-series support. The right
+  choice when your workflow fits its templates and you want a labeling
+  *operation*: projects, many annotators, many data types, served from a
+  server you run.
+- **[TRAINSET](https://github.com/Geocene/trainset)** — a lightweight web app
+  for brushing labels onto time series CSVs. The right choice for quick,
+  small labeling jobs with no setup.
+
+This cookbook is the third route: **you own the app.** It is a small,
+readable codebase that already solves the hard part — staying responsive at
+millions of points — and is meant to be adapted, by you or by an agent
+reading the recipes, into your own tool: your file formats, your label set,
+your keyboard flow, your overlays, packaged as a desktop app that runs
+offline on machines you don't administer. The trade-off is the mirror image
+of the platforms': no user management, no task queues, no hosted anything —
+just an app you shape.
 
 ## Quickstart
 
