@@ -129,25 +129,24 @@ you round-trip to the server for a hover, a keypress, or a drag frame, you are o
 the slow path.
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│  pywebview native window  (run_desktop_app.py)                    │  desktop shell
-│   └─ embeds a local URL, owns native OS file dialogs              │
-├─────────────────────────────────────────────────────────────────┤
-│  Dash app + Flask server  (ts_app/app.py)                         │  server
-│   ├─ layout & components   (components.py)                        │
-│   ├─ figure builder        (figure.py)                            │
-│   ├─ data contract         (data.py, labels.py)                   │
-│   ├─ server-side cache     (flask_caching filesystem)             │
-│   ├─ server callbacks      (load, resample-patch, undo, save)     │
-│   └─ raw Flask routes      (/resample, /profile-log,              │
-│                             /current-file)                        │
-├─────────────────────────────────────────────────────────────────┤
-│  Browser interaction layer                                        │  browser
-│   ├─ clientside callbacks  (inline JS in app.py)                  │
-│   ├─ asset scripts         (ts_app/assets/*.js)                   │
-│   ├─ hidden dcc.Store state + EventListener bridges               │
+┌──────────────────────────────────────────────────────────────────┐
+│  pywebview native window  (run_desktop_app.py)                   │  desktop shell
+│   └─ embeds a local URL, owns native OS file dialogs             │
+├──────────────────────────────────────────────────────────────────┤
+│  Dash app + Flask server (ts_app/app.py)                         │  server
+│   ├─ layout & components (components.py)                         │
+│   ├─ figure builder      (figure.py)                             │
+│   ├─ data contract       (data.py, labels.py)                    │
+│   ├─ server-side cache   (flask_caching filesystem)              │
+│   ├─ server callbacks    (load, resample-patch, undo, save)      │
+│   └─ raw Flask routes    (/resample, /profile-log, /current-file)│
+├──────────────────────────────────────────────────────────────────┤
+│  Browser interaction layer                                       │  browser
+│   ├─ clientside callbacks  (inline JS in app.py)                 │
+│   ├─ asset scripts         (ts_app/assets/*.js)                  │
+│   ├─ hidden dcc.Store state + EventListener bridges              │
 │   └─ Plotly figure (FigureResampler-backed)                      │
-└─────────────────────────────────────────────────────────────────┘
+└──────────────────────────────────────────────────────────────────┘
 ```
 
 ## How to read a recipe
