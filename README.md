@@ -4,7 +4,8 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21763327.svg)](https://doi.org/10.5281/zenodo.21763327)
 
 A **domain-neutral, runnable template** for building interactive Dash + Plotly
-desktop apps that navigate, inspect, and annotate **long time series** smoothly —
+desktop apps that navigate, inspect, and annotate **long, multichannel time
+series** smoothly —
 even at millions of points — using [`plotly-resampler`](https://github.com/predict-idlab/plotly-resampler).
 The signals used in this template are synthetic; the
 *techniques* — resampler-backed navigation, drag-to-select with auto-pan,
@@ -48,6 +49,9 @@ large signals).
 - **Fast navigation on huge signals** — zoom/scroll/drag-pan and arrow-key
   stepping stay smooth because the browser only ever holds a few thousand points
   per trace; the server resamples the visible slice on demand.
+- **Multichannel, with per-channel sampling rates** — every channel builds its
+  own time axis, so mixed-rate recordings (a 512 Hz signal above a 30 Hz one)
+  line up on one shared time axis, stacked in one view.
 - **Custom pointer pan** in both x and the hovered channel's y.
 - **Annotation** — switch to select mode (`m`), then **drag**, **click**, or
   **right-click a segment** to select a region and press a number key to label
