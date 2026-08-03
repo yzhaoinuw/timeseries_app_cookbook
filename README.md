@@ -6,9 +6,7 @@
 A **domain-neutral, runnable template** for building interactive Dash + Plotly
 desktop apps that navigate, inspect, and annotate **long time series** smoothly —
 even at millions of points — using [`plotly-resampler`](https://github.com/predict-idlab/plotly-resampler).
-
-It is distilled from a production biomedical scoring app, with every
-domain-specific detail stripped out. The signals here are synthetic; the
+The signals used in this template are synthetic; the
 *techniques* — resampler-backed navigation, drag-to-select with auto-pan,
 keypress annotation, undo — are the point. Swap in your own data (one function)
 and label set (one config file) and you have your own app.
@@ -25,10 +23,24 @@ large signals).
 - [What you get](#what-you-get)
 - [Quickstart](#quickstart)
 - [Plugging in your own data](#plugging-in-your-own-data)
-- [The one big idea](#the-one-big-idea) · [How to read a recipe](#how-to-read-a-recipe) · [Recipe Index](#recipe-index)
-- Recipes — [Skeleton](#skeleton) (1–5) · [The bridge](#the-bridge) (6) · [Navigation](#navigation) (7–10) · [Annotation](#annotation) (11–16) · [Multi-session](#multi-session) (17)
-- [Cross-cutting patterns](#cross-cutting-patterns) · [Adaptation checklist](#adaptation-checklist) · [Gotcha catalog](#gotcha-catalog) · [Source-file map](#source-file-map)
-- [Real-world example](#real-world-example) · [Citation](#citation) · [Acknowledgment](#acknowledgment) · [Provenance & license](#provenance--license)
+- **The Cookbook**
+  - [The one big idea](#the-one-big-idea)
+  - [How to read a recipe](#how-to-read-a-recipe)
+  - [Recipe Index](#recipe-index)
+    * [Skeleton](#skeleton) (1–5)
+    * [The bridge](#the-bridge) (6)
+    * [Navigation](#navigation) (7–10)
+    * [Annotation](#annotation) (11–16)
+    * [Multi-session](#multi-session) (17)
+- Additional Notes
+    * [Cross-cutting patterns](#cross-cutting-patterns)
+    * [Adaptation checklist](#adaptation-checklist)
+    * [Gotcha catalog](#gotcha-catalog)
+    * [Source-file map](#source-file-map)
+- [Real-world example](#real-world-example)
+- [Citation](#citation)
+- [Acknowledgment](#acknowledgment)
+- [Provenance & license](#provenance--license)
 
 ## What you get
 
@@ -183,7 +195,11 @@ the slow path.
 
 17. [Multi-session desktop windows](#recipe-17--multi-session-desktop-windows)
 
-**Reference:** [Cross-cutting patterns](#cross-cutting-patterns) · [Adaptation checklist](#adaptation-checklist) · [Gotcha catalog](#gotcha-catalog) · [Source-file map](#source-file-map)
+**Additional Notes:** 
+- [Cross-cutting patterns](#cross-cutting-patterns)
+- [Adaptation checklist](#adaptation-checklist)
+- [Gotcha catalog](#gotcha-catalog)
+- [Source-file map](#source-file-map)
 
 ---
 
