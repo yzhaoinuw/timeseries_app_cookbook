@@ -49,6 +49,8 @@ large signals).
 
 [![Time Series Annotator demo — zooming, panning, and annotating a multichannel recording](docs/media/ts_app_demo_poster.png)](docs/media/ts_app_demo.mp4)
 
+https://github.com/user-attachments/assets/0c90e4ae-1e96-44e0-b7b0-037ca0de617e
+
 **▶ [Play the 56-second walkthrough](docs/media/ts_app_demo.mp4)** — scroll-zoom and
 drag-pan on a multichannel recording, switching to select mode, the four ways to
 select a region (box select, right-click a segment, drag continuously past the
