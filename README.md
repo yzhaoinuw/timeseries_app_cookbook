@@ -251,8 +251,10 @@ the slow path.
 
 **Depends on.** Nothing (outermost layer).
 
-**Source.** `run_desktop_app.py` (`BASE_PORT`, `MAX_SESSIONS`), `ts_app/config.py`
-(`WINDOW_CONFIG`), `ts_app/assets/closeWindow.js`.
+**Source.** [`run_desktop_app.py`](run_desktop_app.py)
+([`BASE_PORT`](run_desktop_app.py#L24), [`MAX_SESSIONS`](run_desktop_app.py#L25)),
+[`ts_app/config.py`](ts_app/config.py) ([`WINDOW_CONFIG`](ts_app/config.py#L15)),
+[`ts_app/assets/closeWindow.js`](ts_app/assets/closeWindow.js).
 
 **Mechanism.** The Dash/Flask server runs on `127.0.0.1:<port>` in a **daemon
 thread**. The port comes from a **window-slot claim**: the launcher binds the
@@ -281,7 +283,8 @@ and replace native dialogs with `dcc.Upload`. Everything else here is unchanged.
 **Goal.** A two-phase UI: a minimal **home** screen (load data) replaced by the
 full **visualization** screen once data loads — plus the hidden plumbing.
 
-**Source.** `ts_app/components.py`; swapped in by `create_visualization` in `app.py`.
+**Source.** [`ts_app/components.py`](ts_app/components.py); swapped in by
+[`create_visualization`](ts_app/app.py#L694) in [`app.py`](ts_app/app.py).
 
 **Mechanism.** `components.py` defines:
 1. **`home_div`** — the "Load demo data" / "Open file…" buttons, a message area,
@@ -315,8 +318,12 @@ Guard with `if not n_clicks: raise PreventUpdate` (as the button callbacks do).
 **Goal.** Per-session state (loaded file, label history, the resampler figure)
 that survives across callbacks and even an app restart.
 
-**Source.** `ts_app/app.py` — the `Cache(...)` setup, `initialize_state`, and the
-`FIG_RESAMPLER` global with `store_/get_/clear_fig_resampler`.
+**Source.** [`ts_app/app.py`](ts_app/app.py) — the `Cache(...)` setup,
+[`initialize_state`](ts_app/app.py#L233), and the
+[`FIG_RESAMPLER`](ts_app/app.py#L72) global with
+[`store_fig_resampler`](ts_app/app.py#L88) /
+[`get_fig_resampler`](ts_app/app.py#L93) /
+[`clear_fig_resamplers`](ts_app/app.py#L97).
 
 **Mechanism.** Two tiers, chosen by whether the value is serializable:
 1. **`flask_caching` filesystem cache** for JSON-ish state: `filepath`,
@@ -351,9 +358,13 @@ The code accounts for this (`equal_nan=True` comparisons, `== None` handling in
 **Goal.** Click → native Open dialog (or "Load demo data") → parse → validate →
 render. Same idea for Save.
 
-**Source.** `ts_app/data.py` (the recording contract, `generate_synthetic_recording`,
-`load_recording`, `save_recording`), `ts_app/dialogs.py`, and in `app.py`:
-`load_demo`, `choose_file`, `create_visualization`, `initialize_state`.
+**Source.** [`ts_app/data.py`](ts_app/data.py) (the recording contract,
+[`generate_synthetic_recording`](ts_app/data.py#L96),
+[`load_recording`](ts_app/data.py#L151), [`save_recording`](ts_app/data.py#L133)),
+[`ts_app/dialogs.py`](ts_app/dialogs.py), and in [`app.py`](ts_app/app.py):
+[`load_demo`](ts_app/app.py#L655), [`choose_file`](ts_app/app.py#L671),
+[`create_visualization`](ts_app/app.py#L694),
+[`initialize_state`](ts_app/app.py#L233).
 
 **Mechanism.** The load is a **two-callback handoff** through a store:
 1. `load_demo` / `choose_file` (fire on a button) obtain a file path — the demo
@@ -388,7 +399,9 @@ macOS returns a string-like `objc.pyobjc_unicode` where `result[0]` is the first
 **Goal.** One figure with several stacked channels sharing an x-axis, fast on
 millions of points, carrying an annotation overlay.
 
-**Source.** `ts_app/figure.py` (`build_figure`), `ts_app/labels.py` (`get_padded_labels`).
+**Source.** [`ts_app/figure.py`](ts_app/figure.py)
+([`build_figure`](ts_app/figure.py#L64)), [`ts_app/labels.py`](ts_app/labels.py)
+([`get_padded_labels`](ts_app/labels.py#L16)).
 
 **Mechanism.**
 - A `plotly_resampler.FigureResampler` wraps an N-row `make_subplots` with
@@ -429,9 +442,10 @@ display.
 **Goal.** Let a browser DOM event you dispatch trigger a Dash callback with a
 payload. This is the seam connecting the custom interaction layer to Dash.
 
-**Source.** `ts_app/components.py` (the `EventListener` components) + the asset
-scripts that `document.dispatchEvent(new CustomEvent(...))`, consumed by callbacks
-in `app.py`.
+**Source.** [`ts_app/components.py`](ts_app/components.py) (the `EventListener`
+components) + the [asset scripts](ts_app/assets) that
+`document.dispatchEvent(new CustomEvent(...))`, consumed by callbacks in
+[`app.py`](ts_app/app.py).
 
 **Mechanism.** `dash_extensions.EventListener` exposes a DOM event to Dash via two
 props: `n_events` (increments per fire; use as `Input`) and `event` (the captured
@@ -467,8 +481,9 @@ debounced signal** so the server resamples once when the view settles, not
 
 **Depends on.** Recipe 5, Recipe 6 (dispatches `tsgraphrelayout`).
 
-**Source.** `ts_app/assets/graphRelayoutCoalescer.js`; consumed by
-`update_fig_resampler` in `app.py`.
+**Source.** [`ts_app/assets/graphRelayoutCoalescer.js`](ts_app/assets/graphRelayoutCoalescer.js);
+consumed by [`update_fig_resampler`](ts_app/app.py#L728) in
+[`app.py`](ts_app/app.py).
 
 **Mechanism.** The script listens to `plotly_relayouting` (continuous) and
 `plotly_relayout` (final), extracts the shared-axis x-range (read from
@@ -501,10 +516,14 @@ zoom — fast, minimal bytes.
 
 **Depends on.** Recipe 5, Recipe 7.
 
-**Source.** `ts_app/app.py`: `update_fig_resampler`, `compact_resampler_patch`,
-`build_direct_restyle_payload`, the `/_ts_app/resample` route,
-`RESAMPLER_CALLBACK_OUTPUT`; `ts_app/assets/graphDirectRestyle.js`; the flag
-`ENABLE_DIRECT_PLOTLY_RESTYLE`.
+**Source.** [`ts_app/app.py`](ts_app/app.py):
+[`update_fig_resampler`](ts_app/app.py#L728),
+[`compact_resampler_patch`](ts_app/app.py#L142),
+[`build_direct_restyle_payload`](ts_app/app.py#L169), the
+[`/_ts_app/resample`](ts_app/app.py#L265) route,
+[`RESAMPLER_CALLBACK_OUTPUT`](ts_app/app.py#L715);
+[`ts_app/assets/graphDirectRestyle.js`](ts_app/assets/graphDirectRestyle.js); the
+flag [`ENABLE_DIRECT_PLOTLY_RESTYLE`](ts_app/config.py#L49).
 
 **Mechanism.** The core computation is `fig.construct_update_data_patch({...x
 range...})` (the resampler's method returning the decimated data for the new
@@ -544,7 +563,8 @@ navigation works. The raw route is only needed if you adopt auto-pan.
 
 **Depends on.** Recipe 5, Recipe 7, the `keyboard` EventListener.
 
-**Source.** `ts_app/app.py` — the `pan_figure` clientside callback.
+**Source.** [`ts_app/app.py`](ts_app/app.py) — the
+[`pan_figure`](ts_app/app.py#L338) clientside callback.
 
 **Mechanism.** On an arrow key it reads the shared-axis range (from
 `meta.sharedXAxisKey`), computes a ±30% shift, applies it immediately via a
@@ -570,7 +590,7 @@ template for any custom navigation.
 
 **Depends on.** Recipe 5, Recipe 7.
 
-**Source.** `ts_app/assets/graphCustomPointerPan.js`.
+**Source.** [`ts_app/assets/graphCustomPointerPan.js`](ts_app/assets/graphCustomPointerPan.js).
 
 **Mechanism.** In `pan` mode it intercepts `pointerdown` (no modifiers, left
 button, not on chrome), captures the start x-range and the y-range of the row
@@ -600,7 +620,8 @@ and non-conflicting.
 **Goal.** One key (`m`) toggles navigate (`dragmode="pan"`) ↔ annotate
 (`dragmode="select"`).
 
-**Source.** `ts_app/app.py` — the `switch_mode` clientside callback.
+**Source.** [`ts_app/app.py`](ts_app/app.py) — the
+[`switch_mode`](ts_app/app.py#L311) clientside callback.
 
 **Mechanism.** On `m` it patches `figure.layout.dragmode` and clears leftover
 selections/shapes when leaving select mode.
@@ -624,8 +645,10 @@ neighborhood), or **right-click a segment** (the whole contiguous same-label run
 **Depends on.** Recipe 5, Recipe 11, Recipe 6 (context-menu event),
 `recording-meta-store`.
 
-**Source.** `ts_app/app.py` clientside callbacks `read_box_select`,
-`read_click_select`, `read_bout_context_select`; `ts_app/assets/graphContextMenu.js`.
+**Source.** [`ts_app/app.py`](ts_app/app.py) clientside callbacks
+[`read_box_select`](ts_app/app.py#L409), [`read_click_select`](ts_app/app.py#L504),
+[`read_bout_context_select`](ts_app/app.py#L544);
+[`ts_app/assets/graphContextMenu.js`](ts_app/assets/graphContextMenu.js).
 
 **Mechanism.** Each selection callback ends the same way: compute `[start, end]`
 seconds relative to `start_time`, store them in **`box-select-store`**, draw a
@@ -670,8 +693,10 @@ regions wider than the screen.
 **Depends on.** Recipe 5, Recipe 6 (`tsannotationselect`), Recipe 8 (the raw
 `/_ts_app/resample` route), Recipe 11.
 
-**Source.** `ts_app/assets/annotationAutoPan.js` (the largest asset); consumed by
-`read_annotation_auto_pan_select` in `app.py`.
+**Source.** [`ts_app/assets/annotationAutoPan.js`](ts_app/assets/annotationAutoPan.js)
+(the largest asset); consumed by
+[`read_annotation_auto_pan_select`](ts_app/app.py#L446) in
+[`app.py`](ts_app/app.py).
 
 **Mechanism.** It owns the whole pointer gesture in select mode:
 - **Begin**: record the anchor time and the hovered row's y-range; set
@@ -717,8 +742,9 @@ updates instantly and the change goes to undo history.
 
 **Depends on.** Recipe 5, Recipe 12/13, the `keyboard` EventListener, Recipe 15.
 
-**Source.** `ts_app/app.py` clientside callbacks `make_annotation` and
-`update_labels`; serverside `update_labels_history`.
+**Source.** [`ts_app/app.py`](ts_app/app.py) clientside callbacks
+[`make_annotation`](ts_app/app.py#L615) and [`update_labels`](ts_app/app.py#L593);
+serverside [`update_labels_history`](ts_app/app.py#L799).
 
 **Mechanism.** Two clientside steps:
 1. `make_annotation` fires on a number key (only in select mode, only with a
@@ -749,9 +775,11 @@ from `meta`, so one overlay or N both work without code changes.
 **Goal.** One-step undo, plus automatic salvage of unsaved labels if the app
 restarts on the same file.
 
-**Source.** `ts_app/app.py`: `initialize_state` (creates `deque(maxlen=2)`),
-`update_labels_history`, `undo_annotation`, and the salvage branch in
-`create_visualization`.
+**Source.** [`ts_app/app.py`](ts_app/app.py):
+[`initialize_state`](ts_app/app.py#L233) (creates `deque(maxlen=2)`),
+[`update_labels_history`](ts_app/app.py#L799),
+[`undo_annotation`](ts_app/app.py#L784), and the salvage branch in
+[`create_visualization`](ts_app/app.py#L694).
 
 **Mechanism.** `labels_history` is a `deque(maxlen=2)` in the filesystem cache —
 previous and current arrays. Every real change appends; `undo_annotation` restores
@@ -776,8 +804,11 @@ recovery for free.
 **Goal.** Save labels back to disk via a native Save dialog, and export a segment
 table when fully labeled.
 
-**Source.** `ts_app/app.py::save_labels`; `ts_app/labels.py` (`labels_for_saving`,
-`get_segments`, `first_unscored_segment`); `ts_app/data.py::save_recording`.
+**Source.** [`ts_app/app.py::save_labels`](ts_app/app.py#L818);
+[`ts_app/labels.py`](ts_app/labels.py)
+([`labels_for_saving`](ts_app/labels.py#L40), [`get_segments`](ts_app/labels.py#L48),
+[`first_unscored_segment`](ts_app/labels.py#L79));
+[`ts_app/data.py::save_recording`](ts_app/data.py#L133).
 
 **Mechanism.** On Save: reload the recording, replace its labels with the latest
 history array (NaN/None → `-1`), write a temp `.npz`, then a native Save dialog
@@ -804,11 +835,18 @@ callback globals, cache/temp-file collisions, or the same recording open twice.
 **Depends on.** Recipe 1 (the launcher), Recipe 3 (cache and process globals),
 Recipe 4 (file loading).
 
-**Source.** `run_desktop_app.py` (`BASE_PORT`, `MAX_SESSIONS`,
-`claim_session_slot`); `ts_app/config.py` (`INSTANCE_SLOT`, `PEER_PORTS`); in
-`ts_app/app.py`: the per-slot `TEMP_PATH`, `set_/get_current_filepath`,
-`find_peer_session_with_file`, the `/_ts_app/current-file` route, and the peer
-check in `choose_file`. Regression coverage: `tests/test_multi_session.py`.
+**Source.** [`run_desktop_app.py`](run_desktop_app.py)
+([`BASE_PORT`](run_desktop_app.py#L24), [`MAX_SESSIONS`](run_desktop_app.py#L25),
+[`claim_session_slot`](run_desktop_app.py#L30));
+[`ts_app/config.py`](ts_app/config.py) ([`INSTANCE_SLOT`](ts_app/config.py#L84),
+[`PEER_PORTS`](ts_app/config.py#L85)); in [`ts_app/app.py`](ts_app/app.py): the
+per-slot [`TEMP_PATH`](ts_app/app.py#L67),
+[`set_current_filepath`](ts_app/app.py#L188) /
+[`get_current_filepath`](ts_app/app.py#L193),
+[`find_peer_session_with_file`](ts_app/app.py#L201), the
+[`/_ts_app/current-file`](ts_app/app.py#L255) route, and the peer check in
+[`choose_file`](ts_app/app.py#L671). Regression coverage:
+[`tests/test_multi_session.py`](tests/test_multi_session.py).
 
 **Mechanism.** One **process per window**; a tiny port-slot protocol handles only
 the cross-process concerns:
@@ -953,23 +991,23 @@ pannable multi-channel viewer on huge signals.
 
 | Concern | File |
 | --- | --- |
-| Desktop shell / entrypoint, window-slot claim | `run_desktop_app.py` |
-| Config (window, classes, flags, session slot env) | `ts_app/config.py` |
-| Dash app, callbacks, Flask routes, cache | `ts_app/app.py` |
-| Multi-session coordination | `run_desktop_app.py`, `ts_app/config.py`, `ts_app/app.py` |
-| Layout, stores, EventListeners | `ts_app/components.py` |
-| Figure builder (resampler + overlay) | `ts_app/figure.py` |
-| Data contract, synthetic gen, loader | `ts_app/data.py` |
-| Label padding, segments, export | `ts_app/labels.py` |
-| Native dialogs | `ts_app/dialogs.py` |
-| Relayout coalescing | `ts_app/assets/graphRelayoutCoalescer.js` |
-| Direct restyle | `ts_app/assets/graphDirectRestyle.js` |
-| Custom pointer pan | `ts_app/assets/graphCustomPointerPan.js` |
-| Drag-select + auto-pan | `ts_app/assets/annotationAutoPan.js` |
-| Context-menu select | `ts_app/assets/graphContextMenu.js` |
-| Exit guard | `ts_app/assets/closeWindow.js` |
-| Smoke tests (data/figure/label/routes) | `tests/test_smoke.py` |
-| Multi-session tests (slots/peers/refusal) | `tests/test_multi_session.py` |
+| Desktop shell / entrypoint, window-slot claim | [`run_desktop_app.py`](run_desktop_app.py) |
+| Config (window, classes, flags, session slot env) | [`ts_app/config.py`](ts_app/config.py) |
+| Dash app, callbacks, Flask routes, cache | [`ts_app/app.py`](ts_app/app.py) |
+| Multi-session coordination | [`run_desktop_app.py`](run_desktop_app.py), [`ts_app/config.py`](ts_app/config.py), [`ts_app/app.py`](ts_app/app.py) |
+| Layout, stores, EventListeners | [`ts_app/components.py`](ts_app/components.py) |
+| Figure builder (resampler + overlay) | [`ts_app/figure.py`](ts_app/figure.py) |
+| Data contract, synthetic gen, loader | [`ts_app/data.py`](ts_app/data.py) |
+| Label padding, segments, export | [`ts_app/labels.py`](ts_app/labels.py) |
+| Native dialogs | [`ts_app/dialogs.py`](ts_app/dialogs.py) |
+| Relayout coalescing | [`ts_app/assets/graphRelayoutCoalescer.js`](ts_app/assets/graphRelayoutCoalescer.js) |
+| Direct restyle | [`ts_app/assets/graphDirectRestyle.js`](ts_app/assets/graphDirectRestyle.js) |
+| Custom pointer pan | [`ts_app/assets/graphCustomPointerPan.js`](ts_app/assets/graphCustomPointerPan.js) |
+| Drag-select + auto-pan | [`ts_app/assets/annotationAutoPan.js`](ts_app/assets/annotationAutoPan.js) |
+| Context-menu select | [`ts_app/assets/graphContextMenu.js`](ts_app/assets/graphContextMenu.js) |
+| Exit guard | [`ts_app/assets/closeWindow.js`](ts_app/assets/closeWindow.js) |
+| Smoke tests (data/figure/label/routes) | [`tests/test_smoke.py`](tests/test_smoke.py) |
+| Multi-session tests (slots/peers/refusal) | [`tests/test_multi_session.py`](tests/test_multi_session.py) |
 
 For agent-coordination context (active-vs-legacy notes, test/fixture details, open
 questions), see [`project_overview.md`](project_overview.md).

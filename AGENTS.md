@@ -207,6 +207,11 @@ Do not mention tests, docs, project memory updates, or behind-the-scenes impleme
 
 These are the things that aren't obvious from reading the code and that an agent would otherwise have to learn the hard way. The `README.md` (this repo is the cookbook) explains all of them in depth in its per-feature recipes.
 
+- The README's recipes link into the source with **line anchors**
+  (`ts_app/app.py#L233`). If you move a function, constant, route, or a
+  `# <name>:` clientside-callback comment, re-point the anchor that names it.
+  `tests/test_readme_links.py` fails with the symbol and the line it landed on,
+  so a stale anchor shows up as a test failure rather than a wrong jump.
 - The shared x-axis id and overlay trace indices are **not** hardcoded. `ts_app/figure.py` publishes them in `figure.layout.meta` (`sharedXAxisKey`, `overlayTraceIndices`, `xBounds`, `numClass`, `frameRate`), and every `ts_app/assets/*.js` reads from there — so a different channel count needs no JS edits. If you rename a meta key, update every asset reader.
 - The annotation overlay is a heatmap and needs a **2-D `z`** (`(1, N)`, never `(N,)`).
 - Unscored labels are `-1` on disk and `NaN` (transparent) in display. The filesystem cache turns `NaN` into `None` on round-trip — comparisons use `equal_nan=True` and `== None` (see `ts_app/labels.py`, `app.py`).

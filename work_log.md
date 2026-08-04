@@ -43,6 +43,33 @@ Newest entry goes on top. If the session did multiple distinct pieces of work, u
 
 ## 2026-08-04
 
+### README recipes now link into the source, guarded by a link test (claude-opus-5)
+
+- Every recipe's **Source.** line is clickable now: file paths link to the file,
+  and each named function / constant / Flask route links to its exact line
+  (e.g. `initialize_state` → `ts_app/app.py#L233`). The Source-file map table is
+  linked too.
+- Non-obvious thing found while linking: the clientside callbacks the recipes
+  name (`switch_mode`, `pan_figure`, `read_box_select`, …) are **not** Python
+  `def`s — they are `app.clientside_callback(...)` blocks labeled by a
+  `# <name>: <description>` comment. Those comment lines are what the anchors
+  point at, and they are the only greppable handle on those callbacks.
+- Fixed a stale symbol name the linking pass exposed: the README called the
+  cache helper `clear_fig_resampler`; the real function is `clear_fig_resamplers`.
+- Added `tests/test_readme_links.py` — 216 parametrized checks that keep the
+  links honest: every relative target must exist, every `#Lnn` anchor must still
+  contain the symbol its link text names, and every `#section` anchor must match
+  a real heading slug (GitHub's slug rules, em dash → double hyphen). It covers
+  `docs/media/README.md` as well.
+  - **Why it exists:** line anchors rot silently — move a function and the link
+    points at unrelated code with nothing to signal it. This converts that into
+    a test failure naming the symbol and the line it should be re-pointed at.
+  - Mutation-checked: breaking one line anchor and one section anchor produced
+    exactly two failures with actionable messages.
+- Verification:
+  - `python -m pytest -q` → 242 passed (26 pre-existing + 216 link checks)
+  - `python run_desktop_app.py --smoke` → OK
+
 ### Demo video + hero GIF in the README, and the captioning pipeline tracked (claude-opus-5)
 
 - The README now opens with a **hero GIF** under the badges: a 21-second cut
