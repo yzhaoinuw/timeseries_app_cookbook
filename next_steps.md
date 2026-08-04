@@ -4,20 +4,17 @@ Use this checklist alongside `work_log.md`.
 
 ## Currently Hot
 
-**Demo README awaiting Yue's inspection on `dev`.** As of 2026-08-04 `dev` has
-the hero GIF, the Demo section with the inline video player, and the captioning
-pipeline under `docs/media/`. `main` has been merged in, so `dev` is ahead only
-by the demo work. Remaining:
+Nothing in flight. The demo landed on `main` on 2026-08-04 — hero GIF, the Demo
+section with the inline video player, and the captioning pipeline under
+`docs/media/`. Two standing cautions for whoever touches the demo next:
 
-- **Yue inspects the rendered README on `dev`, then merge to `main`.** That is
-  the only thing blocking this thread.
-- **Keep the raw recording safe.** `~/Desktop/ts_app_demo.mov` is the input the
-  whole pipeline regenerates from and is untracked. If it is lost, changing a
-  caption means re-recording the demo.
-- **Re-minting on re-record.** The Demo section's video is a
-  `github.com/user-attachments/...` URL hosted outside the repo, not a tracked
-  file. Re-running `docs/media/make_demo.sh` will not update it — Yue has to
-  drag-drop the new export into the web editor again.
+- **Back up `docs/media/ts_app_demo.mov` somewhere off this machine.** It is
+  untracked (see `.gitignore`) and is the only input the pipeline can regenerate
+  from. If it is lost, changing one caption means re-recording the whole demo.
+- **A re-record needs the video URL re-minted by hand.** The Demo section embeds
+  a `github.com/user-attachments/...` URL hosted outside the repo. Re-running
+  `docs/media/make_demo.sh` rebuilds the GIF but cannot touch that URL — someone
+  signed into GitHub has to drag-drop the new export into the web editor.
 
 The threads below are optional enhancements, not active work — pick one up only
 when a request reopens it.

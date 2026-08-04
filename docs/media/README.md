@@ -16,8 +16,11 @@ walkthrough video in its [Demo](../../README.md#demo) section.
 
 ```bash
 python3 -m venv venv && ./venv/bin/pip install pillow
-PY=./venv/bin/python ./make_demo.sh ~/Desktop/ts_app_demo.mov
+PY=./venv/bin/python ./make_demo.sh
 ```
+
+It defaults to `ts_app_demo.mov` in this folder; pass a path to use a different
+recording. Any Python with Pillow works — `PY` just points the script at it.
 
 To change what the captions say, edit `CAPTIONS` in `make_banners.py` and re-run.
 To change which stretch of the recording becomes the GIF, edit the `GIF_START` /
@@ -25,11 +28,16 @@ To change which stretch of the recording becomes the GIF, edit the `GIF_START` /
 
 ## Where the source videos live
 
-The raw screen recording (~66MB) and the captioned master (~21MB) are **not
-tracked** — they are too large to be worth versioning, and every asset in the
-README can be regenerated from the raw recording with the command above. They
-live on the maintainer's machine under `~/Desktop/`. Keep the raw recording
-somewhere durable; without it the pipeline has nothing to caption.
+The raw screen recording (`ts_app_demo.mov`, ~66MB), the captioned master
+(`ts_app_demo_captioned.mp4`, ~21MB) and the export (`ts_app_demo_readme.mp4`,
+~4MB) sit in **this folder**, but are **not tracked** — `.gitignore` excludes
+`docs/media/*.mov` and `docs/media/*.mp4`. They are too large to be worth
+versioning and every asset in the README can be rebuilt from the raw recording
+with the command above.
+
+Because they are untracked, a fresh clone will not have them. **Keep
+`ts_app_demo.mov` backed up somewhere durable** — without it, changing a single
+caption means re-recording the whole demo.
 
 ## How the two assets get into the README
 

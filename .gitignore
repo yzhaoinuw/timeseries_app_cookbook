@@ -9,3 +9,9 @@ dist/
 *.npz
 *.csv
 .DS_Store
+
+# Demo source video and intermediate exports. They live in docs/media/ next to
+# the pipeline but are far too large to track; only the hero GIF is committed.
+# Rebuild everything with docs/media/make_demo.sh.
+docs/media/*.mov
+docs/media/*.mp4

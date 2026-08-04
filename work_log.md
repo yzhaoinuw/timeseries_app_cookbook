@@ -63,15 +63,20 @@ Newest entry goes on top. If the session did multiple distinct pieces of work, u
   `docs/media/README.md`. It previously existed only on `~/Desktop/`.
 - The GIF is the only media file tracked. The poster PNG and the 4.2MB mp4 from
   the first pass were removed once the attachment URL existed — both remain
-  recoverable from commit `994ff53`. The raw recording (66MB) and the captioned
-  master (21MB) stay untracked on `~/Desktop/`; everything in the README can be
-  rebuilt from the raw recording.
+  recoverable from commit `994ff53`.
+- Yue then moved the raw recording and the mp4 export into `docs/media/` so the
+  sources sit beside the pipeline. They are deliberately **untracked**:
+  `.gitignore` now excludes `docs/media/*.mov` and `docs/media/*.mp4`, which also
+  covers the captioned master the pipeline regenerates. `make_demo.sh` defaults
+  to `docs/media/ts_app_demo.mov` accordingly, so every input and intermediate
+  lives in one ignored folder and only `ts_app_demo.gif` is committed. A fresh
+  clone has no sources — `ts_app_demo.mov` needs a durable backup elsewhere.
 - Homebrew's ffmpeg is built without libass/freetype, so there is no
   `ass`/`drawtext` filter. Captions are Pillow-rendered transparent PNG banners
   composited with core `overlay` filters gated by `enable='between(t,start,end)'`.
-- Merged `main` into `dev`, so `dev` now carries the legend-overlap / right-click
-  fix and the diagram alignment. `dev` is ahead of `main` only by the demo work,
-  awaiting Yue's inspection before merging back.
+- Merged `main` into `dev` first (one conflict — both work-log entries prepending
+  to the top, resolved by date order), then, after Yue inspected the rendered
+  README on `dev`, merged `dev` back into `main` and pushed both branches.
 - Verification:
   - `python -m pytest -q` → 26 passed
   - `python run_desktop_app.py --smoke` → OK

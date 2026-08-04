@@ -13,10 +13,11 @@
 
 set -euo pipefail
 
-SRC=${1:-$HOME/Desktop/ts_app_demo.mov}
+HERE=$(cd "$(dirname "$0")" && pwd)
+
+SRC=${1:-$HERE/ts_app_demo.mov}
 PY=${PY:-python3}
 
-HERE=$(cd "$(dirname "$0")" && pwd)
 SRC_DIR=$(cd "$(dirname "$SRC")" && pwd)
 STEM=$(basename "$SRC")
 STEM=${STEM%.*}
