@@ -4,21 +4,20 @@ Use this checklist alongside `work_log.md`.
 
 ## Currently Hot
 
-**Demo video awaiting Yue's inspection on `dev`.** The README Demo section and
-`docs/media/` landed on `dev` on 2026-08-04. Open follow-ups once Yue has looked:
+**Demo README awaiting Yue's inspection on `dev`.** As of 2026-08-04 `dev` has
+the hero GIF, the Demo section with the inline video player, and the captioning
+pipeline under `docs/media/`. `main` has been merged in, so `dev` is ahead only
+by the demo work. Remaining:
 
-- **Decide the final embed method.** Today it is a poster image linking to the
-  committed mp4 (opens GitHub's blob player). The alternatives are (a) Yue
-  drag-drops the mp4 into the web editor for a real inline autoplay player via a
-  `user-attachments` URL, or (b) a short committed GIF cut from
-  `ts_app_demo_captioned.mp4` — GIFs do autoplay inline; keep well under ~10MB.
-  Yue floated the 14–35s selection sequence as the flashiest stretch.
-- **Port to `main` once approved.** `main` is the publicly rendered README.
-- **Track the captioning pipeline.** `make_banners.py` (caption text + timings)
-  and the ffmpeg overlay recipe live only on `~/Desktop/ts_app_demo_captioning/`.
-  Yue wanted them kept for future demos — decide whether they belong in this repo
-  (e.g. `docs/media/`) before the Desktop copy is lost. Local ffmpeg has no
-  libass/freetype, hence the PNG-banner-plus-`overlay` approach.
+- **Yue inspects the rendered README on `dev`, then merge to `main`.** That is
+  the only thing blocking this thread.
+- **Keep the raw recording safe.** `~/Desktop/ts_app_demo.mov` is the input the
+  whole pipeline regenerates from and is untracked. If it is lost, changing a
+  caption means re-recording the demo.
+- **Re-minting on re-record.** The Demo section's video is a
+  `github.com/user-attachments/...` URL hosted outside the repo, not a tracked
+  file. Re-running `docs/media/make_demo.sh` will not update it — Yue has to
+  drag-drop the new export into the web editor again.
 
 The threads below are optional enhancements, not active work — pick one up only
 when a request reopens it.

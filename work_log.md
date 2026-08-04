@@ -43,31 +43,41 @@ Newest entry goes on top. If the session did multiple distinct pieces of work, u
 
 ## 2026-08-04
 
-### Captioned demo video added to the README on `dev` (claude-opus-5)
+### Demo video + hero GIF in the README, and the captioning pipeline tracked (claude-opus-5)
 
-- Added a **Demo** section to the README, directly above "What you get", plus a
-  Contents entry. It shows a poster frame that links to the 56-second captioned
-  walkthrough (scroll-zoom, drag-pan, mode switch, the four selection gestures,
-  keypress labeling, undo, save).
-- Committed two media files under a new `docs/media/`:
-  - `ts_app_demo.mp4` — 1600px, 15fps, CRF 24, 4.2MB README export.
-  - `ts_app_demo_poster.png` — frame at t=34s of the captioned master, 1200px.
-- Embedding decision: GitHub does **not** render an inline player for a committed
-  mp4 referenced by relative path — the link opens the blob page, which does play.
-  The poster-image-linking-to-the-video pattern was chosen so the README shows
-  something visual without the upload step. A true inline autoplay player needs a
-  `github.com/user-attachments/...` URL, which only Yue can mint by drag-dropping
-  the mp4 into the web editor (the pattern already used in `sleep_scoring`).
-- The clip was recorded against the `main` build (title bar reads 0.1.1); `dev` is
-  still 0.1.0 and lacks main's legend-overlap / right-click fix. Cosmetic only for
-  inspection purposes.
-- The captioning pipeline (`make_banners.py` + the ffmpeg filtergraph recipe) is
-  still only on `~/Desktop/ts_app_demo_captioning/` and is **not** tracked here —
-  see `next_steps.md`.
+- The README now opens with a **hero GIF** under the badges: a 21-second cut
+  (14–35s of the recording) of the selection sequence, 800px / 10fps / 48-color
+  palette, ~3.0MB.
+- The **Demo** section (above "What you get", with a Contents entry) embeds the
+  full 56-second walkthrough as an inline autoplay player. Yue minted the
+  `github.com/user-attachments/...` URL by drag-dropping the export into the web
+  editor; the embed is that URL, not a repo file.
+- Embedding rules worth not rediscovering: a committed `.mp4` referenced by
+  relative path does **not** produce an inline player — the link only opens the
+  blob page. Committed GIFs *do* render inline and autoplay (keep them well under
+  ~10MB or GitHub's image proxy may refuse them). Minting a `user-attachments`
+  URL requires a signed-in human and cannot be scripted.
+- The captioning pipeline is now tracked under `docs/media/`: `make_banners.py`
+  (caption text + timings live in its `CAPTIONS` list) and `make_demo.sh`
+  (banners → captioned master → README mp4 export → hero GIF), both explained in
+  `docs/media/README.md`. It previously existed only on `~/Desktop/`.
+- The GIF is the only media file tracked. The poster PNG and the 4.2MB mp4 from
+  the first pass were removed once the attachment URL existed — both remain
+  recoverable from commit `994ff53`. The raw recording (66MB) and the captioned
+  master (21MB) stay untracked on `~/Desktop/`; everything in the README can be
+  rebuilt from the raw recording.
+- Homebrew's ffmpeg is built without libass/freetype, so there is no
+  `ass`/`drawtext` filter. Captions are Pillow-rendered transparent PNG banners
+  composited with core `overlay` filters gated by `enable='between(t,start,end)'`.
+- Merged `main` into `dev`, so `dev` now carries the legend-overlap / right-click
+  fix and the diagram alignment. `dev` is ahead of `main` only by the demo work,
+  awaiting Yue's inspection before merging back.
 - Verification:
   - `python -m pytest -q` → 26 passed
   - `python run_desktop_app.py --smoke` → OK
-  - `ffprobe` on the export → 1600x986, 15fps, 55.5s, 4.17MB
+  - `docs/media/make_demo.sh` run end to end against the raw recording, with the
+    source symlinked into a scratch dir so the regenerated masters did not
+    overwrite the ones on `~/Desktop/`
 
 ## 2026-08-03
 

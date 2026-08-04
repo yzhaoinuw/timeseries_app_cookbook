@@ -3,6 +3,8 @@
 [![Agent Collab Treaty](https://raw.githubusercontent.com/yzhaoinuw/agent_collab_treaty/main/assets/treaty-adopted.svg)](https://github.com/yzhaoinuw/agent_collab_treaty)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21763327.svg)](https://doi.org/10.5281/zenodo.21763327)
 
+![Selecting and labeling regions on a multichannel recording](docs/media/ts_app_demo.gif)
+
 A **domain-neutral, runnable template** for building interactive Dash + Plotly
 desktop apps that navigate, inspect, and annotate **long, multichannel time
 series** smoothly —
@@ -47,15 +49,13 @@ large signals).
 
 ## Demo
 
-[![Time Series Annotator demo — zooming, panning, and annotating a multichannel recording](docs/media/ts_app_demo_poster.png)](docs/media/ts_app_demo.mp4)
-
 https://github.com/user-attachments/assets/0c90e4ae-1e96-44e0-b7b0-037ca0de617e
 
-**▶ [Play the 56-second walkthrough](docs/media/ts_app_demo.mp4)** — scroll-zoom and
-drag-pan on a multichannel recording, switching to select mode, the four ways to
-select a region (box select, right-click a segment, drag continuously past the
-screen edge, single-click a thin strip), labeling with a number key, undo, and
-save. Every gesture in the clip is a recipe below.
+The full 56-second walkthrough: scroll-zoom and drag-pan on a multichannel
+recording, switching to select mode, the four ways to select a region (box
+select, right-click a segment, drag continuously past the screen edge,
+single-click a thin strip), labeling with a number key, undo, and save. Every
+gesture in the clip is a recipe below.
 
 ## What you get
 
