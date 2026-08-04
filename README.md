@@ -21,6 +21,7 @@ large signals).
 
 ## Contents
 
+- [Demo](#demo)
 - [What you get](#what-you-get)
 - [How this compares](#how-this-compares)
 - [Quickstart](#quickstart)
@@ -43,6 +44,16 @@ large signals).
 - [Citation](#citation)
 - [Acknowledgment](#acknowledgment)
 - [Provenance & license](#provenance--license)
+
+## Demo
+
+[![Time Series Annotator demo — zooming, panning, and annotating a multichannel recording](docs/media/ts_app_demo_poster.png)](docs/media/ts_app_demo.mp4)
+
+**▶ [Play the 56-second walkthrough](docs/media/ts_app_demo.mp4)** — scroll-zoom and
+drag-pan on a multichannel recording, switching to select mode, the four ways to
+select a region (box select, right-click a segment, drag continuously past the
+screen edge, single-click a thin strip), labeling with a number key, undo, and
+save. Every gesture in the clip is a recipe below.
 
 ## What you get
 

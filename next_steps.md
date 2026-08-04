@@ -4,9 +4,24 @@ Use this checklist alongside `work_log.md`.
 
 ## Currently Hot
 
-Nothing in flight. The template is complete, tested, documented, licensed, and
-pushed to `origin/main`. The threads below are optional enhancements, not active
-work — pick one up only when a request reopens it.
+**Demo video awaiting Yue's inspection on `dev`.** The README Demo section and
+`docs/media/` landed on `dev` on 2026-08-04. Open follow-ups once Yue has looked:
+
+- **Decide the final embed method.** Today it is a poster image linking to the
+  committed mp4 (opens GitHub's blob player). The alternatives are (a) Yue
+  drag-drops the mp4 into the web editor for a real inline autoplay player via a
+  `user-attachments` URL, or (b) a short committed GIF cut from
+  `ts_app_demo_captioned.mp4` — GIFs do autoplay inline; keep well under ~10MB.
+  Yue floated the 14–35s selection sequence as the flashiest stretch.
+- **Port to `main` once approved.** `main` is the publicly rendered README.
+- **Track the captioning pipeline.** `make_banners.py` (caption text + timings)
+  and the ffmpeg overlay recipe live only on `~/Desktop/ts_app_demo_captioning/`.
+  Yue wanted them kept for future demos — decide whether they belong in this repo
+  (e.g. `docs/media/`) before the Desktop copy is lost. Local ffmpeg has no
+  libass/freetype, hence the PNG-banner-plus-`overlay` approach.
+
+The threads below are optional enhancements, not active work — pick one up only
+when a request reopens it.
 
 ## Optional enhancements (paused / not started)
 

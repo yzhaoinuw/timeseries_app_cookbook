@@ -41,6 +41,34 @@ Keep the parenthetical compact. Examples:
 Newest entry goes on top. If the session did multiple distinct pieces of work, use multiple `###` subsections under one `##` date header.
 -->
 
+## 2026-08-04
+
+### Captioned demo video added to the README on `dev` (claude-opus-5)
+
+- Added a **Demo** section to the README, directly above "What you get", plus a
+  Contents entry. It shows a poster frame that links to the 56-second captioned
+  walkthrough (scroll-zoom, drag-pan, mode switch, the four selection gestures,
+  keypress labeling, undo, save).
+- Committed two media files under a new `docs/media/`:
+  - `ts_app_demo.mp4` — 1600px, 15fps, CRF 24, 4.2MB README export.
+  - `ts_app_demo_poster.png` — frame at t=34s of the captioned master, 1200px.
+- Embedding decision: GitHub does **not** render an inline player for a committed
+  mp4 referenced by relative path — the link opens the blob page, which does play.
+  The poster-image-linking-to-the-video pattern was chosen so the README shows
+  something visual without the upload step. A true inline autoplay player needs a
+  `github.com/user-attachments/...` URL, which only Yue can mint by drag-dropping
+  the mp4 into the web editor (the pattern already used in `sleep_scoring`).
+- The clip was recorded against the `main` build (title bar reads 0.1.1); `dev` is
+  still 0.1.0 and lacks main's legend-overlap / right-click fix. Cosmetic only for
+  inspection purposes.
+- The captioning pipeline (`make_banners.py` + the ffmpeg filtergraph recipe) is
+  still only on `~/Desktop/ts_app_demo_captioning/` and is **not** tracked here —
+  see `next_steps.md`.
+- Verification:
+  - `python -m pytest -q` → 26 passed
+  - `python run_desktop_app.py --smoke` → OK
+  - `ffprobe` on the export → 1600x986, 15fps, 55.5s, 4.17MB
+
 ## 2026-07-10
 
 ### Multi-session support ported from the reference app (claude-fable-5)
