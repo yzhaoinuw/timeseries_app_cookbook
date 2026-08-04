@@ -514,7 +514,11 @@
     }
 
     function beginDrag(event) {
-        if (event.button !== 0 || dragState) {
+        // ctrl+left-click is the macOS secondary click: it raises `contextmenu`,
+        // so leave it to graphContextMenu.js. Without this the pointerup would
+        // dispatch a kind="click" selection and replace the segment box the
+        // right-click just selected.
+        if (event.button !== 0 || event.ctrlKey || dragState) {
             return;
         }
         const root = event.target.closest ? event.target.closest(`#${GRAPH_ID}`) : null;

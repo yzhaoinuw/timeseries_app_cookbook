@@ -27,7 +27,7 @@ repository-code: "https://github.com/yzhaoinuw/timeseries_app_cookbook"
 license: MIT
 # Matches VERSION in ts_app/__init__.py. Keep the two in step, and tag the
 # release to match.
-version: 0.1.0
+version: 0.1.1
 keywords:
   - time series
   - data visualization
@@ -40,4 +40,4 @@ keywords:
 # Zenodo concept DOI. It resolves to the newest release, so it stays correct
 # without editing; the per-release DOIs are reachable from that record.
 doi: "10.5281/zenodo.21763327"
-date-released: "2026-08-02"
+date-released: "2026-08-03"

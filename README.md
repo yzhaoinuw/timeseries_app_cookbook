@@ -170,25 +170,24 @@ you round-trip to the server for a hover, a keypress, or a drag frame, you are o
 the slow path.
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│  pywebview native window  (run_desktop_app.py)                    │  desktop shell
-│   └─ embeds a local URL, owns native OS file dialogs              │
-├─────────────────────────────────────────────────────────────────┤
-│  Dash app + Flask server  (ts_app/app.py)                         │  server
-│   ├─ layout & components   (components.py)                        │
-│   ├─ figure builder        (figure.py)                            │
-│   ├─ data contract         (data.py, labels.py)                   │
-│   ├─ server-side cache     (flask_caching filesystem)             │
-│   ├─ server callbacks      (load, resample-patch, undo, save)     │
-│   └─ raw Flask routes      (/resample, /profile-log,              │
-│                             /current-file)                        │
-├─────────────────────────────────────────────────────────────────┤
-│  Browser interaction layer                                        │  browser
-│   ├─ clientside callbacks  (inline JS in app.py)                  │
-│   ├─ asset scripts         (ts_app/assets/*.js)                   │
-│   ├─ hidden dcc.Store state + EventListener bridges               │
+┌──────────────────────────────────────────────────────────────────┐
+│  pywebview native window  (run_desktop_app.py)                   │  desktop shell
+│   └─ embeds a local URL, owns native OS file dialogs             │
+├──────────────────────────────────────────────────────────────────┤
+│  Dash app + Flask server (ts_app/app.py)                         │  server
+│   ├─ layout & components (components.py)                         │
+│   ├─ figure builder      (figure.py)                             │
+│   ├─ data contract       (data.py, labels.py)                    │
+│   ├─ server-side cache   (flask_caching filesystem)              │
+│   ├─ server callbacks    (load, resample-patch, undo, save)      │
+│   └─ raw Flask routes    (/resample, /profile-log, /current-file)│
+├──────────────────────────────────────────────────────────────────┤
+│  Browser interaction layer                                       │  browser
+│   ├─ clientside callbacks  (inline JS in app.py)                 │
+│   ├─ asset scripts         (ts_app/assets/*.js)                  │
+│   ├─ hidden dcc.Store state + EventListener bridges              │
 │   └─ Plotly figure (FigureResampler-backed)                      │
-└─────────────────────────────────────────────────────────────────┘
+└──────────────────────────────────────────────────────────────────┘
 ```
 
 ## How to read a recipe
@@ -647,6 +646,19 @@ single-frame fix, or "relabel this whole segment." Funneling all three into one
 **Gotchas.** Integer rounding has an edge case when `start === end`; the code
 expands to a full frame deliberately. All three gate on select mode.
 
+The right-click path has to keep Plotly out of the way, or the three methods
+fight each other. Plotly starts its drag/click machinery from `mousedown` on the
+drag layer, and its click handler runs for the **right** button too — the
+right-click flag only suppresses a synthetic `click` re-dispatch. Left alone, a
+right-click lands a `plotly_click` in `clickData` on mouseup and
+`read_click_select` overwrites the segment box with its thin neighborhood strip.
+It presents as an *intermittent* failure, because Plotly only emits the click
+when it has live hover data and skips it entirely when the press jittered past
+the drag threshold. `graphContextMenu.js` therefore swallows the right-button
+press in the capture phase, the same way Recipe 13 swallows the left-button one.
+Use `stopPropagation` only — `preventDefault` on `mousedown` cancels
+`contextmenu` in WebKit, which is the event the whole recipe runs on.
+
 ---
 
 ### Recipe 13 — Drag-to-select with auto-pan
@@ -691,7 +703,10 @@ buffer fractions. Needs the raw route (Recipe 8) and `meta.xBounds` (Recipe 5).
 release delay) or relayouts fight. Single-flight + the stale-guard
 (`requestId < latestAppliedTraceRequestId`) prevent request pileup and out-of-order
 application — keep both. `CLICK_PX` decides click vs drag so a stationary press
-still selects a neighborhood.
+still selects a neighborhood. `beginDrag` ignores ctrl-held presses: ctrl+left
+is the macOS secondary click, so it raises `contextmenu`, and without the guard
+the pointerup would dispatch a `kind: "click"` selection that replaces the
+segment Recipe 12 just selected.
 
 ---
 

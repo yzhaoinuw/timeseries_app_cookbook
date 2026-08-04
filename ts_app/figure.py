@@ -166,14 +166,22 @@ def build_figure(recording, plot_name="", n_shown_samples=DEFAULT_N_SHOWN_SAMPLE
     fig.update_layout(
         autosize=True,
         height=800,
-        margin=dict(t=50, l=10, r=5, b=20),
+        margin=dict(t=64, l=10, r=5, b=20),
         hovermode="x unified",
         hoverlabel=dict(bgcolor="rgba(255,255,255,0.6)"),
         title=dict(text=plot_name, font=dict(size=16), x=0.03, xanchor="left"),
+        # The legend lives in the top margin, opposite the title: anchored to the
+        # figure *container* (not the plot area) so it never rides down over row 1
+        # the way a paper-referenced legend does, and so its position is
+        # independent of the figure height.
         legend=dict(
-            x=0.5,
-            y=1.02,
             orientation="h",
+            xref="paper",
+            x=1.0,
+            xanchor="right",
+            yref="container",
+            y=0.985,
+            yanchor="top",
             bgcolor="rgba(0,0,0,0)",
             font=dict(size=10),
         ),
